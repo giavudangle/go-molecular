@@ -23,11 +23,12 @@ MEMCACHED=localhost:11211 \
   go run .
 ```
 
-### PostgreSQL
 
-#### PostgreSQL Docker
+#### PostgreSQL and PgAdmin4 Docker 
 
+```bash
 ```
+# start a postgres container
 docker run \
   -d \
   -e POSTGRES_HOST_AUTH_METHOD=trust \
@@ -35,23 +36,19 @@ docker run \
   -e POSTGRES_PASSWORD=password \
   -e POSTGRES_DB=dbname \
   -p 5432:5432 \
-  postgre:12.5-alpine
+  postgres
 ```
-
-#### Pg4Admin Docker
-
-```bash
-# create a custom network for easier connecting
-$ docker network create pg
-
-# start a postgres container
-$ docker run -d -e POSTGRES_PASSWORD=password --network=pg --name postgres postgres
-
+Reverse Proxying
 # start pgAdmin container
-$ docker run -d -p 5050:5050 --name pgadmin --network=pg thajeztah/pgadmin4
+docker pull dpage/pgadmin4
+docker run -p 5050:80 \
+    -e 'PGADMIN_DEFAULT_EMAIL=vudangdev@gmail.com' \
+    -e 'PGADMIN_DEFAULT_PASSWORD=vudang' \
+    -d dpage/pgadmin4
+
+# create server 
+host_name: your ipV4 address given from $ifconfig or $ipconfig
 ```
-
-
 
 #### Migrations
 
@@ -64,7 +61,7 @@ go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate
 Then, assuming you used docker, you can run:
 
 ```
-migrate -path db/migrations/ -database postgres://user:password@localhost:5432/dbname?sslmode=disable up
+migrate -path db/migrations/ -database postgres://postgres:password@localhost:5432/molecular_db?sslmode=disable up
 ```
 
 ### Memcached
@@ -73,7 +70,7 @@ migrate -path db/migrations/ -database postgres://user:password@localhost:5432/d
 docker run \
   -d \
   -p 11211:11211 \
-  memcached:1.6.9-alpine
+  memcached
 ```
 
 ### Load testing data
