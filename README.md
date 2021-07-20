@@ -18,7 +18,7 @@ go mod download
 Then you can run `server.go` with the PostgreSQL and memcached configuration:
 
 ```
-DATABASE_URL=postgres://user:password@localhost:5432/dbname?sslmode=disable \
+DATABASE_URL=postgres://user:vudang@localhost:5432/service_db?sslmode=disable \
 MEMCACHED=localhost:11211 \
   go run .
 ```
@@ -32,7 +32,7 @@ docker run \
   -d \
   -e POSTGRES_HOST_AUTH_METHOD=trust \
   -e POSTGRES_USER=user \
-  -e POSTGRES_PASSWORD=password \
+  -e POSTGRES_PASSWORD=vudang \
   -e POSTGRES_DB=dbname \
   -p 5432:5432 \
   postgres
@@ -62,8 +62,9 @@ go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate
 Then, assuming you used docker, you can run:
 
 ```
-migrate -path db/migrations/ -database postgres://postgres:password@localhost:5432/molecular_db?sslmode=disable up
+migrate -path db/migrations/ -database postgres://user:vudang@localhost:5432/service_db?sslmode=disable up
 ```
+
 
 ### Memcached
 
@@ -85,7 +86,7 @@ go install github.com/MarioCarrion/complex-pipelines/part5
 Then run it using:
 
 ```
-DATABASE_URL="postgres://user:password@localhost:5432/dbname?sslmode=disable" part5
+DATABASE_URL="postgres://user:vudang@localhost:5432/service_db?sslmode=disable" part5
 ```
 
 Sadly, at the moment this tool does not provide any progress feedback; but it should finish after a couple of minutes.
