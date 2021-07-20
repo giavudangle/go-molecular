@@ -27,7 +27,6 @@ MEMCACHED=localhost:11211 \
 #### PostgreSQL and PgAdmin4 Docker 
 
 ```bash
-```
 # start a postgres container
 docker run \
   -d \
@@ -38,7 +37,9 @@ docker run \
   -p 5432:5432 \
   postgres
 ```
-Reverse Proxying
+
+### Reverse Proxying
+```bash
 # start pgAdmin container
 docker pull dpage/pgadmin4
 docker run -p 5050:80 \
