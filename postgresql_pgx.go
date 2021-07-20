@@ -7,26 +7,26 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-type PostgreSQL struct {
+type PostgreSQLpgx struct {
 	pool *pgxpool.Pool
 }
 
-func NewPostgreSQL() (*PostgreSQL, error) {
+func NewPostgreSQLpgx() (*PostgreSQLpgx, error) {
 	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		return nil, err
 	}
 
-	return &PostgreSQL{
+	return &PostgreSQLpgx{
 		pool: pool,
 	}, nil
 }
 
-func (p *PostgreSQL) Close() {
+func (p *PostgreSQLpgx) Close() {
 	p.pool.Close()
 }
 
-func (p *PostgreSQL) FindByNConst(nconst string) (Name, error) {
+func (p *PostgreSQLpgx) FindByNConst(nconst string) (Name, error) {
 	query := `SELECT nconst, primary_name, birth_year, death_year FROM "names" WHERE nconst = $1`
 
 	var res Name

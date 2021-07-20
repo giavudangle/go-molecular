@@ -22,19 +22,6 @@ type Error struct {
 }
 
 func main() {
-	db, err := NewPostgreSQL()
-	if err != nil {
-		log.Fatalf("Could not initialize Database connection %s", err)
-	}
-	defer db.Close()
-
-	mc, err := NewMemcached()
-	if err != nil {
-		log.Fatalf("Could not initialize Memcached client %s", err)
-	}
-
-	//-
-
 	router := mux.NewRouter()
 
 	renderJSON := func(w http.ResponseWriter, val interface{}, statusCode int) {
@@ -42,25 +29,67 @@ func main() {
 		_ = json.NewEncoder(w).Encode(val)
 	}
 
-	router.HandleFunc("/names/{id}", func(w http.ResponseWriter, r *http.Request) {
+	//-
+
+	dbSQL, err := NewPostgreSQLsql()
+	if err != nil {
+		log.Fatalf("Could not initialize Database connection using sqlx %s", err)
+	}
+	defer dbSQL.Close()
+
+	router.HandleFunc("/names/sql/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := mux.Vars(r)["id"]
 
-		val, err := mc.GetName(id)
-		if err == nil {
-			renderJSON(w, &val, http.StatusOK)
-			return
-		}
-
-		name, err := db.FindByNConst(id)
+		name, err := dbSQL.FindByNConst(id)
 		if err != nil {
 			renderJSON(w, &Error{Message: err.Error()}, http.StatusInternalServerError)
 			return
 		}
 
-		_ = mc.SetName(name) // XXX
+		renderJSON(w, &name, http.StatusOK)
+	})
+
+	//-
+
+	dbSQLX, err := NewPostgreSQLsqlx()
+	if err != nil {
+		log.Fatalf("Could not initialize Database connection using sqlx %s", err)
+	}
+	defer dbSQLX.Close()
+
+	router.HandleFunc("/names/sqlx/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := mux.Vars(r)["id"]
+
+		name, err := dbSQLX.FindByNConst(id)
+		if err != nil {
+			renderJSON(w, &Error{Message: err.Error()}, http.StatusInternalServerError)
+			return
+		}
 
 		renderJSON(w, &name, http.StatusOK)
 	})
+
+	//-
+
+	pgxDB, err := NewPostgreSQLpgx()
+	if err != nil {
+		log.Fatalf("Could not initialize Database connection using pgx %s", err)
+	}
+	defer pgxDB.Close()
+
+	router.HandleFunc("/names/pgx/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := mux.Vars(r)["id"]
+
+		name, err := pgxDB.FindByNConst(id)
+		if err != nil {
+			renderJSON(w, &Error{Message: err.Error()}, http.StatusInternalServerError)
+			return
+		}
+
+		renderJSON(w, &name, http.StatusOK)
+	})
+
+	//-
 
 	fmt.Println("Starting server :8080")
 
